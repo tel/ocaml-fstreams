@@ -11,7 +11,7 @@ Library fstreams
   FindlibName: fstreams
   Pack:        true
   BuildTools:  ocamlbuild
-  Modules:     Option, Finite, Infinite, Std
+  Modules:     Option, Finite, Infinite
   
 AlphaFeatures: ocamlbuild_more_args
 Document fstreams_api
