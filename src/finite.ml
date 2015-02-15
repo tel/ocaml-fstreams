@@ -24,10 +24,10 @@ and     seq_ sa sb = match sa with
   | Empty         -> Lazy.force sb
   | Cons (x, xs') -> Cons (x, seq xs' sb)
 
-let rec fold  cons empty s = lazy (fold_ cons empty (Lazy.force s))
+let rec fold  cons empty s = fold_ cons empty (Lazy.force s)
 and     fold_ cons empty   = function
   | Empty        -> empty
-  | Cons (a, tl) -> cons a (fold cons empty tl)
+  | Cons (a, tl) -> cons a (lazy (fold_ cons empty (Lazy.force tl)))
 
 let rec fold_left  snoc acc s = fold_left_ snoc acc (Lazy.force s)
 and     fold_left_ snoc acc   = function
@@ -90,14 +90,10 @@ and     nth_ n   = function
   | Empty        -> None
   | Cons (h, tl) -> if n <= 0 then Some h else nth (n-1) tl
       
-let keep phi =
-  fold
-    (fun a r ->
-       Option.fold
-         (fun b -> Cons (b, r))
-         (Lazy.force r)
-         (phi a))
-    Empty
-
+let keep phi s =
+  let folder a r = match phi a with
+    | None   -> Lazy.force r
+    | Some b -> Cons (b, r)
+  in lazy (fold folder Empty s)
 
 let filter pred = keep (fun a -> if pred a then Some a else None)

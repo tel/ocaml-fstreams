@@ -8,7 +8,7 @@ val cons : 'a -> 'a t -> 'a t
 
 (** Interleaves two streams *)
 val alt : 'a t -> 'a t -> 'a t
-val fold : ('a -> 'r Lazy.t -> 'r) -> ('a t -> 'r Lazy.t)
+val fold : ('a -> 'r Lazy.t -> 'r) -> ('a t -> 'r)
 val unfold : ('s -> 'a * 's) -> ('s -> 'a t)
 val trajectory : ('a -> 'a) -> ('a -> 'a t)
 val generate : (unit -> 'a) -> 'a t

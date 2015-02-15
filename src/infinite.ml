@@ -12,8 +12,8 @@ let cons head tail = lazy { head; tail }
 let rec alt  sa sb = lazy (alt_ (Lazy.force sa) sb)
 and     alt_ xs ys = { head = xs.head; tail = alt ys xs.tail }
 
-let rec fold  cons s = lazy (fold_ cons (Lazy.force s))
-and     fold_ cons s = cons s.head (fold cons s.tail)
+let rec fold  cons s = fold_ cons (Lazy.force s)
+and     fold_ cons s = cons s.head (lazy (fold_ cons (Lazy.force s.tail)))
 
 let rec unfold  phi s = lazy (unfold_ phi s)
 and     unfold_ phi s = let (head, s) = phi s in { head; tail = unfold phi s }
@@ -54,12 +54,10 @@ let tails s = ap (ap (pure drop) ints) (pure s)
 let nth n s = head (drop n s)
 
 let keep phi s =
-  let folder a tail =
-    Option.fold
-      (fun b -> { head = b; tail })
-      (Lazy.force tail)
-      (phi a)
-  in fold folder s
+  let folder a r = match phi a with
+    | None   -> Lazy.force r
+    | Some b -> { head = b; tail = r }
+  in lazy (fold folder s)
 
 let filter pred s = keep (fun a -> if pred a then Some a else None) s
 

@@ -16,7 +16,7 @@ val seq        : 'a t -> 'a t -> 'a t
 (** Non-strict right fold. If [f] is careful about forcing its second
     argument only as needed then [fold f z s] can return in finite
     time even when [s] is infinite. *)
-val fold       : ('a -> 'r Lazy.t -> 'r) -> 'r -> ('a t -> 'r Lazy.t)
+val fold       : ('a -> 'r Lazy.t -> 'r) -> 'r -> ('a t -> 'r)
 
 (** Strict left fold. If [s] is infinite then [fold_left f z s] will
     never terminate. The advantage is that [fold_left] is
