@@ -39,6 +39,8 @@ and     unfold_ phi s = match phi s with
   | None         -> Empty
   | Some (a, s_) -> Cons (a, unfold phi s_)
 
+let trajectory endo x = unfold (fun x -> Some (x, endo x)) x
+
 let rec of_list  l = lazy (of_list_ l)
 and     of_list_   = function
   | []      -> Empty

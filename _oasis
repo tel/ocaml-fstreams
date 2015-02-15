@@ -7,11 +7,12 @@ License:     BSD-3-clause
 Plugins:     META (0.4), StdFiles (0.4), DevFiles (0.4)
 
 Library fstreams
-  Path:        src
-  FindlibName: fstreams
-  Pack:        true
-  BuildTools:  ocamlbuild
-  Modules:     Option, Finite, Infinite
+  Path:            src
+  FindlibName:     fstreams
+  Pack:            true
+  BuildTools:      ocamlbuild
+  Modules:         Finite, Infinite
+  InternalModules: Option
   
 AlphaFeatures: ocamlbuild_more_args
 Document fstreams_api

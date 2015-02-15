@@ -18,6 +18,8 @@ and     fold_ cons s = cons s.head (fold cons s.tail)
 let rec unfold  phi s = lazy (unfold_ phi s)
 and     unfold_ phi s = let (head, s) = phi s in { head; tail = unfold phi s }
 
+let trajectory endo x = unfold (fun x -> (x, endo x)) x
+
 let rec iter eff s =
   let { head; tail } = Lazy.force s in
   eff head; iter eff tail
