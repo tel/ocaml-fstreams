@@ -81,3 +81,20 @@ and     drop_ n s =
   
 let inits s = ap (ap (pure take) ints) (pure s)
 let tails s = ap (ap (pure drop) ints) (pure s)
+
+let rec nth  n s = nth_ n (Lazy.force s)
+and     nth_ n   = function
+  | Empty        -> None
+  | Cons (h, tl) -> if n <= 0 then Some h else nth (n-1) tl
+      
+let keep phi s =
+  fold
+    (fun a r ->
+       Option.fold
+         (fun b -> Cons (b, r))
+         (Lazy.force r)
+         (phi a))
+    Empty
+    s
+
+let filter pred s = keep (fun a -> if pred a then Some a else None) s

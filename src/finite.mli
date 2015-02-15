@@ -34,3 +34,6 @@ val take       : int -> 'a t -> 'a list
 val drop       : int -> 'a t -> 'a t
 val inits      : 'a t -> 'a list t
 val tails      : 'a t -> 'a t t
+val nth        : int -> 'a t -> 'a option
+val keep       : ('a -> 'b option) -> ('a t -> 'b t)
+val filter     : ('a -> bool) -> ('a t -> 'a t)

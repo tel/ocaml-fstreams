@@ -48,3 +48,18 @@ let rec drop n s =
   
 let inits s = ap (ap (pure take) ints) (pure s)
 let tails s = ap (ap (pure drop) ints) (pure s)
+
+let nth n s = head (drop n s)
+
+let keep phi s =
+  let folder a tail =
+    Option.fold
+      (fun b -> { head = b; tail })
+      (Lazy.force tail)
+      (phi a)
+  in fold folder s
+
+let filter pred s = keep (fun a -> if pred a then Some a else None) s
+
+let extract  s = (Lazy.force s).head
+let extend f s = map f (tails s)
