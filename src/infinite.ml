@@ -20,6 +20,8 @@ and     unfold_ phi s = let (head, s) = phi s in { head; tail = unfold phi s }
 
 let trajectory endo x = unfold (fun x -> (x, endo x)) x
 
+let generate gen = unfold (fun s -> (gen s, s)) ()
+
 let rec iter eff s =
   let { head; tail } = Lazy.force s in
   eff head; iter eff tail

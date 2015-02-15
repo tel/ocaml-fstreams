@@ -1,5 +1,5 @@
 (** Finite streams *)
-type 'a t
+type +'a t
 
 val head       : 'a t -> 'a option
 val tail       : 'a t -> 'a t option
@@ -24,6 +24,7 @@ val fold       : ('a -> 'r Lazy.t -> 'r) -> 'r -> ('a t -> 'r Lazy.t)
 val fold_left  : ('r -> 'a -> 'r) -> 'r -> ('a t -> 'r)
 val unfold     : ('s -> ('a * 's) option) -> ('s -> 'a t)
 val trajectory : ('a -> 'a) -> ('a -> 'a t)
+val generate   : (unit -> 'a option) -> 'a t
 val of_list    : 'a list -> 'a t
 val map        : ('a -> 'b) -> ('a t -> 'b t)
 val ints       : int t

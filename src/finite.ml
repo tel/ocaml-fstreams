@@ -41,6 +41,9 @@ and     unfold_ phi s = match phi s with
 
 let trajectory endo x = unfold (fun x -> Some (x, endo x)) x
 
+let generate gen =
+  unfold (fun s -> Option.map (fun a -> (a, s)) (gen s)) ()
+
 let rec of_list  l = lazy (of_list_ l)
 and     of_list_   = function
   | []      -> Empty
@@ -87,7 +90,7 @@ and     nth_ n   = function
   | Empty        -> None
   | Cons (h, tl) -> if n <= 0 then Some h else nth (n-1) tl
       
-let keep phi s =
+let keep phi =
   fold
     (fun a r ->
        Option.fold
@@ -95,6 +98,6 @@ let keep phi s =
          (Lazy.force r)
          (phi a))
     Empty
-    s
 
-let filter pred s = keep (fun a -> if pred a then Some a else None) s
+
+let filter pred = keep (fun a -> if pred a then Some a else None)

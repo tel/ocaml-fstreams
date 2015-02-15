@@ -1,5 +1,5 @@
 (** Infinite streams *)
-type 'a t
+type +'a t
 
 val head : 'a t -> 'a
 val tail : 'a t -> 'a t
@@ -11,6 +11,7 @@ val alt : 'a t -> 'a t -> 'a t
 val fold : ('a -> 'r Lazy.t -> 'r) -> ('a t -> 'r Lazy.t)
 val unfold : ('s -> 'a * 's) -> ('s -> 'a t)
 val trajectory : ('a -> 'a) -> ('a -> 'a t)
+val generate : (unit -> 'a) -> 'a t
 
 (** Iterates down values of the stream forever. *)
 val iter : ('a -> unit) -> ('a t -> unit)
