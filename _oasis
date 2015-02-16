@@ -4,7 +4,7 @@ Version:     0.1
 Synopsis:    Functional, lazy streams.
 Authors:     Joseph Abrahamson <me@jspha.com>
 License:     BSD-3-clause
-Plugins:     META (0.4), StdFiles (0.4), DevFiles (0.4)
+Plugins:     META (0.4), DevFiles (0.4)
 
 Library fstreams
   Path:            src

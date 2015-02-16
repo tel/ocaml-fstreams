@@ -5,3 +5,8 @@ setup.data
 setup.log
 
 *.docdir
+
+*.mldylib
+*.mllib
+*.mlpack
+*.odocl

@@ -1,0 +1,11 @@
+# OASIS_START
+# DO NOT EDIT (digest: 46515351e924a262dd47c25aeab21a21)
+version = "0.1"
+description = "Functional, lazy streams."
+archive(byte) = "fstreams.cma"
+archive(byte, plugin) = "fstreams.cma"
+archive(native) = "fstreams.cmxa"
+archive(native, plugin) = "fstreams.cmxs"
+exists_if = "fstreams.cma"
+# OASIS_STOP
+
