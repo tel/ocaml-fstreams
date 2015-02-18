@@ -9,8 +9,8 @@ let tail s = snd (uncons s)
 
 let cons head tail = lazy { head; tail }
 
-let rec alt  sa sb = lazy (alt_ (Lazy.force sa) sb)
-and     alt_ xs ys = { head = xs.head; tail = alt ys xs.tail }
+let rec interleave  sa sb = lazy (interleave_ (Lazy.force sa) sb)
+and     interleave_ xs ys = { head = xs.head; tail = interleave ys xs.tail }
 
 let rec fold  cons s = fold_ cons (Lazy.force s)
 and     fold_ cons s = cons s.head (lazy (fold_ cons (Lazy.force s.tail)))
@@ -35,6 +35,14 @@ let pure a     = tabulate (fun _ -> a)
 
 let rec ap  fs xs = lazy (ap_ (Lazy.force fs) (Lazy.force xs))
 and     ap_ fs xs = { head = fs.head xs.head; tail = ap fs.tail xs.tail }
+
+let rec map2  f xs ys = lazy (map2_ f (Lazy.force xs) (Lazy.force ys))
+and     map2_ f xs ys = { head = f xs.head ys.head; tail = map2 f xs.tail ys.tail }
+
+let rec map3  f xs ys zs = lazy (map3_ f (Lazy.force xs) (Lazy.force ys) (Lazy.force zs))
+and     map3_ f xs ys zs = { head = f xs.head ys.head zs.head
+                           ; tail = map3 f xs.tail ys.tail zs.tail
+                           }
 
 (* With strict lists we need to build this using an accumulator to
    get tail recursion. I'm not sure if there's a faster list
@@ -63,3 +71,5 @@ let filter pred s = keep (fun a -> if pred a then Some a else None) s
 
 let extract  s = (Lazy.force s).head
 let extend f s = map f (tails s)
+
+let push s = tail s

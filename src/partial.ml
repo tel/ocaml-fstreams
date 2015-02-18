@@ -34,6 +34,11 @@ and     fold_left_ snoc acc   = function
   | Empty        -> acc
   | Cons (a, tl) -> fold_left snoc (snoc acc a) tl
 
+let rec iter eff ?finally:(finally = fun x -> x) s =
+  match Lazy.force s with
+  | Cons (a, s_) -> eff a; iter eff s_
+  | Empty -> finally ()
+
 let rec unfold  phi s = lazy (unfold_ phi s)
 and     unfold_ phi s = match phi s with
   | None         -> Empty
@@ -108,3 +113,7 @@ let keep phi s =
   in lazy (fold folder Empty s)
 
 let filter pred = keep (fun a -> if pred a then Some a else None)
+
+let push s = match Lazy.force s with
+  | Cons (a, tl) -> tl
+  | Empty        -> lazy Empty

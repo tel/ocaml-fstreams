@@ -1,4 +1,4 @@
-(** Partial lazy streams.
+(** Partial, lazy, functional streams; may terminate or may not.
 
     Streams are lazy data structures which contain values in
     sequence. Due to laziness, streams may be infinite (e.g. {!ints}
@@ -29,7 +29,7 @@ val empty : 'a t
 (** Partial streams admit an empty value. *)
 
 val cons : 'a -> 'a t -> 'a t
-(** Prepend a new element on the stream. *)
+(** Extend a stream by prepending a value. *)
 
 val unfold : ('s -> ('a * 's) option) -> ('s -> 'a t)
 (** Lazily unfolds a partial stream. In each step of [unfold build s],
@@ -74,9 +74,16 @@ val tabulate : (int -> 'a option) -> 'a t
     See {!nth}.
 *)
 
+val ints : int t
+(** An infinite stream of all integers. *)
+
 (** {i See also}: {!pure} *)
 
+
+
 (** {1:elimination Value elimination } *)
+
+
 
 val head : 'a t -> 'a option
 val tail : 'a t -> 'a t option
@@ -101,19 +108,25 @@ val fold_left : ('r -> 'a -> 'r) -> 'r -> ('a t -> 'r)
     never terminate. On the other hand, [fold_left] must be
     tail-recursive. *)
 
+val iter : ('a -> unit) -> ?finally:(unit -> unit) -> ('a t -> unit)
+(** Impure consumption of a stream. If the end of the stream is
+    reached then the [finally] callback will be invoked. {i This
+    function is dangerous.} It may be the case that the consumed
+    stream is infinite and therefore [iter f s] will not
+    return. Consider calling it asynchronously. *)
+
 val nth : 'a t -> (int -> 'a option)
 (** Convert a stream into an accessor function on index. See
     {!tabulate}. *)
                   
 
-(** {1:functor Streams are {i Functors}} *)
-(** Streams are covariant functor data types. *)
+(** {1:functor Streams are {i covariant functors}} *)
 
 val map : ('a -> 'b) -> ('a t -> 'b t)
 (** Applies a function valuewise to a stream. *)
 
 
-(** {1:applicative Streams are {i Applicative} functors} *)
+(** {1:applicative Streams are {i applicative} functors} *)
 (** Streams are "zippy" applicative functors. *)
 
 val pure : 'a -> 'a t
@@ -121,7 +134,8 @@ val pure : 'a -> 'a t
 
 val ap : ('a -> 'b) t -> ('a t -> 'b t)
 (** "Zips" a stream of functions with a stream of their arguments
-    returning the resulting list. *)
+    returning the resulting list. If one stream is shorter than the
+    other then the result will be the length of the shorter stream. *)
 
 val map2 : ('a -> 'b -> 'c) -> ('a t -> 'b t -> 'c t)
 (** A generalization of {!map} afforded by {!pure} and {!ap}. This
@@ -137,10 +151,6 @@ val map3 : ('a -> 'b -> 'c -> 'd ) -> ('a t -> 'b t -> 'c t -> 'd t)
     {[ map3 f a b c = ap (ap (ap (pure f) a) b) c ]}
 *)
                                         
-(** {1:standards Standard streams } *)
-
-val ints : int t
-(** An infinite stream of all integers. *)
 
 
 (** {1:extras Other operations } *)
@@ -154,21 +164,26 @@ val concat : 'a t -> 'a t -> 'a t
 (** Concatenates finite streams, one then the next. Streams are
     monoidal under the {!empty} stream and {!concat}. *)
 
-val take       : int -> 'a t -> 'a list
+val push : 'a t -> 'a t
+(** If a stream [s] is interpreted as a process through time then
+    [push s] is the same process beginning at {v t=-1 v} instead of {v
+    t=0 v}. *)
+
+val take : int -> 'a t -> 'a list
 (** Convert a prefix of a stream into a [list]. Note that the list
     [take n s] is not necessarily as long as [n]. *)
 
-val drop       : int -> 'a t -> 'a t
+val drop : int -> 'a t -> 'a t
 (** Trim off a prefix of a stream. *)
     
-val inits      : 'a t -> 'a list t
+val inits : 'a t -> 'a list t
 (** Stream all prefixes of a stream. *)
 
-val tails      : 'a t -> 'a t t
+val tails : 'a t -> 'a t t
 (** Stream all suffixes of a stream. *)
     
-val keep       : ('a -> 'b option) -> ('a t -> 'b t)
+val keep : ('a -> 'b option) -> ('a t -> 'b t)
 (** Transform a stream dropping some elements. See {!map}. *)
 
-val filter     : ('a -> bool) -> ('a t -> 'a t)
+val filter : ('a -> bool) -> ('a t -> 'a t)
 (** Dropping some elements of a stream. See {!keep}. *)
