@@ -1,6 +1,6 @@
 OASISFormat: 0.4
 Name:        fstreams
-Version:     0.1.2
+Version:     0.2.1
 Synopsis:    Functional, lazy streams.
 Authors:     Joseph Abrahamson <me@jspha.com>
 License:     BSD-3-clause
