@@ -1,7 +1,11 @@
-type 'a t = 'a q Lazy.t
- and 'a q = 
-   | Cons of 'a * 'a t
-   | Empty
+module Impl = struct
+  type 'a t = 'a q Lazy.t
+  and 'a q = 
+    | Cons of 'a * 'a t
+    | Empty
+end
+
+include Impl
 
 let rec uncons q = uncons_ (Lazy.force q)
 and uncons_ = function

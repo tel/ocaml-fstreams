@@ -168,3 +168,15 @@ val keep       : ('a -> 'b option) -> ('a t -> 'b t)
 
 val filter     : ('a -> bool) -> ('a t -> 'a t)
 (** Dropping some elements of a stream. See {!keep}. *)
+
+
+(** {1:impl Implementation} *)
+
+(** The stream implementation is exposed to allow certain tricky
+    definitions. {i This will hopefully be removed in later
+    versions, try not to depend upon it!} *)
+
+module Impl : sig
+  type 'a t = 'a q Lazy.t
+  and 'a q = { head : 'a; tail : 'a t }
+end

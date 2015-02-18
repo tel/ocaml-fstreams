@@ -1,5 +1,10 @@
-type 'a t = 'a q Lazy.t
- and 'a q = { head : 'a; tail : 'a t }
+
+module Impl = struct
+  type 'a t = 'a q Lazy.t
+  and 'a q = { head : 'a; tail : 'a t }
+end
+
+include Impl
 
 let rec uncons  q = uncons_ (Lazy.force q)
 and     uncons_ s = (s.head, s.tail)
