@@ -10,7 +10,7 @@ Library fstreams
   Path:            src
   Pack:            true
   BuildTools:      ocamlbuild
-  Modules:         Finite, Infinite
+  Modules:         Partial, Total
   InternalModules: Option
   
 AlphaFeatures: ocamlbuild_more_args

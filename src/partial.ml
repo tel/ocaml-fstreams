@@ -14,15 +14,15 @@ let tail s = Option.map snd (uncons s)
 let cons a tl = lazy (Cons (a, tl))
 let empty     = lazy Empty
 
-let rec alt  sa sb = lazy (alt_ (Lazy.force sa) sb)
-and     alt_ xs ys = match xs with
+let rec interleave  sa sb = lazy (interleave_ (Lazy.force sa) sb)
+and     interleave_ xs ys = match xs with
   | Empty         -> Lazy.force ys
-  | Cons (x, xs') -> Cons (x, alt ys xs')
+  | Cons (x, xs') -> Cons (x, interleave ys xs')
 
-let rec seq  sa sb = lazy (seq_ (Lazy.force sa) sb)
-and     seq_ sa sb = match sa with
+let rec concat  sa sb = lazy (concat_ (Lazy.force sa) sb)
+and     concat_ sa sb = match sa with
   | Empty         -> Lazy.force sb
-  | Cons (x, xs') -> Cons (x, seq xs' sb)
+  | Cons (x, xs') -> Cons (x, concat xs' sb)
 
 let rec fold  cons empty s = fold_ cons empty (Lazy.force s)
 and     fold_ cons empty   = function
@@ -41,7 +41,7 @@ and     unfold_ phi s = match phi s with
 
 let trajectory endo x = unfold (fun x -> Some (x, endo x)) x
 
-let generate gen =
+let impure gen =
   unfold (fun s -> Option.map (fun a -> (a, s)) (gen s)) ()
 
 let rec of_list  l = lazy (of_list_ l)
@@ -55,13 +55,24 @@ and     map_ f   = function
   | Cons (a, tl) -> Cons (f a, map f tl)
 
 let ints       = unfold (fun n -> Some (n, n+1)) 0
-let tabulate f = map f ints
-let pure a     = tabulate (fun _ -> a)
+let tabulate f = unfold (fun n -> Option.map (fun a -> (a, n+1)) (f n)) 0
+let pure a     = tabulate (fun _ -> Some a)
 
 let rec ap  fs xs = lazy (ap_ (Lazy.force fs) (Lazy.force xs))
 and     ap_ fs xs = match fs, xs with
   | Cons (f, fs_), Cons (x, xs_) -> Cons (f x, ap fs_ xs_)
   | _            , _             -> Empty
+
+let rec map2  f xs ys = lazy (map2_ f (Lazy.force xs) (Lazy.force ys))
+and     map2_ f xs ys = match xs, ys with
+  | Cons (x, xs_), Cons (y, ys_) -> Cons (f x y, map2 f xs_ ys_)
+  | _            , _             -> Empty
+
+let rec map3  f xs ys zs = lazy (map3_ f (Lazy.force xs) (Lazy.force ys) (Lazy.force zs))
+and     map3_ f xs ys zs = match xs, ys, zs with
+  | Cons (x, xs_), Cons (y, ys_), Cons (z, zs_) ->
+    Cons (f x y z, map3 f xs_ ys_ zs_)
+  | _ -> Empty
 
 (* With strict lists we need to build this using an accumulator to
    get tail recursion. I'm not sure if there's a faster list
@@ -85,10 +96,10 @@ and     drop_ n s =
 let inits s = ap (ap (pure take) ints) (pure s)
 let tails s = ap (ap (pure drop) ints) (pure s)
 
-let rec nth  n s = nth_ n (Lazy.force s)
-and     nth_ n   = function
+let rec nth  s n = nth_ (Lazy.force s) n
+and     nth_ s n = match s with
   | Empty        -> None
-  | Cons (h, tl) -> if n <= 0 then Some h else nth (n-1) tl
+  | Cons (h, tl) -> if n <= 0 then Some h else nth tl (n-1)
       
 let keep phi s =
   let folder a r = match phi a with

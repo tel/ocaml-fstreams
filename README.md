@@ -24,3 +24,11 @@ Copyright and license
 
 Fstreams is distributed under the terms of the Berkeley software
 distribution license (3 clauses).
+
+Tk
+--
+
+* Functions for injecting `Total` streams into `Partial` streams and
+  for cycling `Partial` streams into `Total` ones.
+* Include `ZArith` package and use big integers in all the appropriate
+  places.
