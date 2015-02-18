@@ -1,0 +1,245 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<link rel="stylesheet" href="style.css" type="text/css">
+<meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+<link rel="Start" href="index.html">
+<link rel="next" href="Total.html">
+<link rel="Up" href="index.html">
+<link title="Index of types" rel=Appendix href="index_types.html">
+<link title="Index of values" rel=Appendix href="index_values.html">
+<link title="Index of modules" rel=Appendix href="index_modules.html">
+<link title="Partial" rel="Chapter" href="Partial.html">
+<link title="Total" rel="Chapter" href="Total.html">
+<link title="Void" rel="Chapter" href="Void.html"><link title="Value introduction " rel="Section" href="#introduction">
+<link title="Value elimination " rel="Section" href="#elimination">
+<link title="Streams are covariant functors" rel="Section" href="#functor">
+<link title="Streams are applicative functors" rel="Section" href="#applicative">
+<link title="Other operations " rel="Section" href="#extras">
+<link title="Implementation" rel="Section" href="#impl">
+<title>Partial</title>
+</head>
+<body>
+<div class="navbar">&nbsp;<a class="up" href="index.html" title="Index">Up</a>
+&nbsp;<a class="post" href="Total.html" title="Total">Next</a>
+</div>
+<h1>Module <a href="type_Partial.html">Partial</a></h1>
+
+<pre><span class="keyword">module</span> Partial: <code class="code"><span class="keyword">sig</span></code> <a href="Partial.html">..</a> <code class="code"><span class="keyword">end</span></code></pre><div class="info module top">
+Partial, lazy, functional streams; may terminate or may not.
+<p>
+
+    Streams are lazy data structures which contain values in
+    sequence. Due to laziness, streams may be infinite (e.g. <a href="Partial.html#VALints"><code class="code"><span class="constructor">Partial</span>.ints</code></a>
+    below). The streams in this module are "partial" referring to the
+    fact that <a href="Partial.html#elimination"><code class="code">eliminators</code></a> like <a href="Partial.html#VALhead"><code class="code"><span class="constructor">Partial</span>.head</code></a>,
+    <a href="Partial.html#VALtail"><code class="code"><span class="constructor">Partial</span>.tail</code></a>, and <a href="Partial.html#VALuncons"><code class="code"><span class="constructor">Partial</span>.uncons</code></a> return values wrapped in <code class="code">option</code> producing
+    <code class="code"><span class="constructor">None</span></code> when if the stream contains no further values.
+<p>
+
+    The streams in the <a href="Total.html"><code class="code"><span class="constructor">Total</span></code></a> module are a sister datatype to these
+    streams which is "total", e.g. <a href="Total.html#VALuncons"><code class="code"><span class="constructor">Total</span>.uncons</code></a> returns pure
+    values.
+<p>
+
+    Mathematically, partial streams are the greatest fixed point of
+    the functor <code class="code"><span class="constructor">F</span> <span class="constructor">X</span> = 1 + <span class="constructor">A</span> * <span class="constructor">X</span></code>.<br>
+</div>
+<hr width="100%">
+
+<pre><span id="TYPEt"><span class="keyword">type</span> <code class="type">+'a</code> t</span> </pre>
+<div class="info ">
+A partial lazy stream; a potentially unbounded sequence of values
+    of type <code class="code"><span class="keywordsign">'</span>a</code>.<br>
+</div>
+
+<br>
+<h1 id="introduction">Value introduction </h1><br>
+
+<pre><span id="VALempty"><span class="keyword">val</span> empty</span> : <code class="type">'a <a href="Partial.html#TYPEt">t</a></code></pre><div class="info ">
+Partial streams admit an empty value.<br>
+</div>
+
+<pre><span id="VALcons"><span class="keyword">val</span> cons</span> : <code class="type">'a -> 'a <a href="Partial.html#TYPEt">t</a> -> 'a <a href="Partial.html#TYPEt">t</a></code></pre><div class="info ">
+Extend a stream by prepending a value.<br>
+</div>
+
+<pre><span id="VALunfold"><span class="keyword">val</span> unfold</span> : <code class="type">('s -> ('a * 's) option) -> 's -> 'a <a href="Partial.html#TYPEt">t</a></code></pre><div class="info ">
+Lazily unfolds a partial stream. In each step of <code class="code">unfold build s</code>,
+    the current seed is passed to <code class="code">build</code> to produce either <code class="code"><span class="constructor">None</span></code>,
+    indicating the stream has now terminated, or <code class="code"><span class="constructor">Some</span> (a, s')</code> giving
+    the next value of the stream and the new seed value, e.g.
+<p>
+
+    <pre class="codepre"><code class="code">&nbsp;<span class="keyword">let</span>&nbsp;ints&nbsp;:&nbsp;int&nbsp;t&nbsp;=&nbsp;unfold&nbsp;(<span class="keyword">fun</span>&nbsp;n&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Some</span>&nbsp;(n,&nbsp;n+1))&nbsp;0&nbsp;</code></pre><br>
+</div>
+
+<pre><span id="VALtrajectory"><span class="keyword">val</span> trajectory</span> : <code class="type">('a -> 'a) -> 'a -> 'a <a href="Partial.html#TYPEt">t</a></code></pre><div class="info ">
+Generate an infinite stream from the trajectory of a
+    endomorphism. In other words, <code class="code">head (trajectory f a) = a</code> and
+    <code class="code">tail (trajectory f a) = trajectory f (f a)</code><br>
+</div>
+
+<pre><span id="VALimpure"><span class="keyword">val</span> impure</span> : <code class="type">(unit -> 'a option) -> 'a <a href="Partial.html#TYPEt">t</a></code></pre><div class="info ">
+Generates a list impurely. Each new value of the stream <code class="code">impure f</code>
+    is produced by calling <code class="code">f ()</code> until it is <code class="code"><span class="constructor">None</span></code>. See also
+    <a href="Partial.html#VALtabulate"><code class="code"><span class="constructor">Partial</span>.tabulate</code></a>.<br>
+</div>
+
+<pre><span id="VALof_list"><span class="keyword">val</span> of_list</span> : <code class="type">'a list -> 'a <a href="Partial.html#TYPEt">t</a></code></pre><div class="info ">
+Lists can be seen as equivalent to necessarily finite
+    streams. This function injects a list into the type of partial
+    streams.
+<p>
+
+    In particular, a linked list is the least fixed point of the
+    functor <code class="code"><span class="constructor">F</span> <span class="constructor">X</span> = 1 + <span class="constructor">A</span> * <span class="constructor">X</span></code>, the same functor that partial streams
+    are the greatest fixed point of.<br>
+</div>
+
+<pre><span id="VALtabulate"><span class="keyword">val</span> tabulate</span> : <code class="type">(int -> 'a option) -> 'a <a href="Partial.html#TYPEt">t</a></code></pre><div class="info ">
+Generates a stream by tabulation of values. The generation
+    proceeds sequentially such that the stream <code class="code">tabulate f</code> is either
+    infinite or has length equal to the <i>first</i> <code class="code">n</code> such that <code class="code">f n =
+    <span class="constructor">None</span></code>.
+<p>
+
+    Partial streams can be seen as memoizations of functions of type
+    <code class="code">int <span class="keywordsign">-&gt;</span> <span class="keywordsign">'</span>a option</code> so long as the "compaction" property above
+    holds. This correspondence is nicer for <a href="Total.html"><code class="code"><span class="constructor">Total</span></code></a> streams (see
+    <a href="Total.html#VALtabulate"><code class="code"><span class="constructor">Total</span>.tabulate</code></a>).
+<p>
+
+    See <a href="Partial.html#VALnth"><code class="code"><span class="constructor">Partial</span>.nth</code></a>.<br>
+</div>
+
+<pre><span id="VALints"><span class="keyword">val</span> ints</span> : <code class="type">int <a href="Partial.html#TYPEt">t</a></code></pre><div class="info ">
+An infinite stream of all integers.<br>
+</div>
+<br>
+<i>See also</i>: <a href="Partial.html#VALpure"><code class="code"><span class="constructor">Partial</span>.pure</code></a><br>
+<br>
+<h1 id="elimination">Value elimination </h1><br>
+
+<pre><span id="VALhead"><span class="keyword">val</span> head</span> : <code class="type">'a <a href="Partial.html#TYPEt">t</a> -> 'a option</code></pre>
+<pre><span id="VALtail"><span class="keyword">val</span> tail</span> : <code class="type">'a <a href="Partial.html#TYPEt">t</a> -> 'a <a href="Partial.html#TYPEt">t</a> option</code></pre>
+<pre><span id="VALuncons"><span class="keyword">val</span> uncons</span> : <code class="type">'a <a href="Partial.html#TYPEt">t</a> -> ('a * 'a <a href="Partial.html#TYPEt">t</a>) option</code></pre><div class="info ">
+The "principle eliminator" for a stream. Can be used along with
+    recursion to derive all of the others. The fact that the return
+    value is optional indicates the potentially finite nature of
+    partial streams.<br>
+</div>
+
+<pre><span id="VALfold"><span class="keyword">val</span> fold</span> : <code class="type">('a -> 'r Lazy.t -> 'r) -> 'r -> 'a <a href="Partial.html#TYPEt">t</a> -> 'r</code></pre><div class="info ">
+Non-strict right fold. If <code class="code">f</code> is careful about forcing its second
+    argument only as needed then <code class="code">fold f z s</code> can return in finite
+    time even when <code class="code">s</code> is infinite.
+<p>
+
+    This is the principle recursor of a partial stream. Essentially
+    any function eliminating streams can be derived from <a href="Partial.html#VALfold"><code class="code"><span class="constructor">Partial</span>.fold</code></a>.<br>
+</div>
+
+<pre><span id="VALfold_left"><span class="keyword">val</span> fold_left</span> : <code class="type">('r -> 'a -> 'r) -> 'r -> 'a <a href="Partial.html#TYPEt">t</a> -> 'r</code></pre><div class="info ">
+Strict left fold. If <code class="code">s</code> is infinite then <code class="code">fold_left f z s</code> will
+    never terminate. On the other hand, <code class="code">fold_left</code> must be
+    tail-recursive.<br>
+</div>
+
+<pre><span id="VALiter"><span class="keyword">val</span> iter</span> : <code class="type">('a -> unit) -> ?finally:(unit -> unit) -> 'a <a href="Partial.html#TYPEt">t</a> -> unit</code></pre><div class="info ">
+Impure consumption of a stream. If the end of the stream is
+    reached then the <code class="code">finally</code> callback will be invoked. <i>This
+    function is dangerous.</i> It may be the case that the consumed
+    stream is infinite and therefore <code class="code">iter f s</code> will not
+    return. Consider calling it asynchronously.<br>
+</div>
+
+<pre><span id="VALnth"><span class="keyword">val</span> nth</span> : <code class="type">'a <a href="Partial.html#TYPEt">t</a> -> int -> 'a option</code></pre><div class="info ">
+Convert a stream into an accessor function on index. See
+    <a href="Partial.html#VALtabulate"><code class="code"><span class="constructor">Partial</span>.tabulate</code></a>.<br>
+</div>
+<br>
+<h1 id="functor">Streams are <i>covariant functors</i></h1><br>
+
+<pre><span id="VALmap"><span class="keyword">val</span> map</span> : <code class="type">('a -> 'b) -> 'a <a href="Partial.html#TYPEt">t</a> -> 'b <a href="Partial.html#TYPEt">t</a></code></pre><div class="info ">
+Applies a function valuewise to a stream.<br>
+</div>
+<br>
+<h1 id="applicative">Streams are <i>applicative</i> functors</h1><br>
+<br>
+Streams are "zippy" applicative functors.<br>
+
+<pre><span id="VALpure"><span class="keyword">val</span> pure</span> : <code class="type">'a -> 'a <a href="Partial.html#TYPEt">t</a></code></pre><div class="info ">
+Produces the infinite, constant stream of some value.<br>
+</div>
+
+<pre><span id="VALap"><span class="keyword">val</span> ap</span> : <code class="type">('a -> 'b) <a href="Partial.html#TYPEt">t</a> -> 'a <a href="Partial.html#TYPEt">t</a> -> 'b <a href="Partial.html#TYPEt">t</a></code></pre><div class="info ">
+"Zips" a stream of functions with a stream of their arguments
+    returning the resulting list. If one stream is shorter than the
+    other then the result will be the length of the shorter stream.<br>
+</div>
+
+<pre><span id="VALmap2"><span class="keyword">val</span> map2</span> : <code class="type">('a -> 'b -> 'c) -> 'a <a href="Partial.html#TYPEt">t</a> -> 'b <a href="Partial.html#TYPEt">t</a> -> 'c <a href="Partial.html#TYPEt">t</a></code></pre><div class="info ">
+A generalization of <a href="Partial.html#VALmap"><code class="code"><span class="constructor">Partial</span>.map</code></a> afforded by <a href="Partial.html#VALpure"><code class="code"><span class="constructor">Partial</span>.pure</code></a> and <a href="Partial.html#VALap"><code class="code"><span class="constructor">Partial</span>.ap</code></a>. This
+    version may be more efficient than the equivalent version produced
+    using <a href="Partial.html#VALpure"><code class="code"><span class="constructor">Partial</span>.pure</code></a> and <a href="Partial.html#VALap"><code class="code"><span class="constructor">Partial</span>.ap</code></a>.
+    <pre class="codepre"><code class="code">&nbsp;map2&nbsp;f&nbsp;a&nbsp;b&nbsp;=&nbsp;ap&nbsp;(ap&nbsp;(pure&nbsp;f)&nbsp;a)&nbsp;b&nbsp;</code></pre><br>
+</div>
+
+<pre><span id="VALmap3"><span class="keyword">val</span> map3</span> : <code class="type">('a -> 'b -> 'c -> 'd) -><br>       'a <a href="Partial.html#TYPEt">t</a> -> 'b <a href="Partial.html#TYPEt">t</a> -> 'c <a href="Partial.html#TYPEt">t</a> -> 'd <a href="Partial.html#TYPEt">t</a></code></pre><div class="info ">
+A generalization of <a href="Partial.html#VALmap"><code class="code"><span class="constructor">Partial</span>.map</code></a> afforded by <a href="Partial.html#VALpure"><code class="code"><span class="constructor">Partial</span>.pure</code></a> and <a href="Partial.html#VALap"><code class="code"><span class="constructor">Partial</span>.ap</code></a>. This
+    version may be more efficient than the equivalent version produced
+    using <a href="Partial.html#VALpure"><code class="code"><span class="constructor">Partial</span>.pure</code></a> and <a href="Partial.html#VALap"><code class="code"><span class="constructor">Partial</span>.ap</code></a>.
+    <pre class="codepre"><code class="code">&nbsp;map3&nbsp;f&nbsp;a&nbsp;b&nbsp;c&nbsp;=&nbsp;ap&nbsp;(ap&nbsp;(ap&nbsp;(pure&nbsp;f)&nbsp;a)&nbsp;b)&nbsp;c&nbsp;</code></pre><br>
+</div>
+<br>
+<h1 id="extras">Other operations </h1><br>
+
+<pre><span id="VALinterleave"><span class="keyword">val</span> interleave</span> : <code class="type">'a <a href="Partial.html#TYPEt">t</a> -> 'a <a href="Partial.html#TYPEt">t</a> -> 'a <a href="Partial.html#TYPEt">t</a></code></pre><div class="info ">
+Interleaves two streams, non-associative. For instance, the
+    streams <code class="code"><span class="keyword">let</span> x = [1;2;3;...]</code> and <code class="code"><span class="keyword">let</span> y = [a;b;c;...]</code> are
+    interwoven to form <code class="code">interleave x y = [1;a;2;b;3;c;...]</code>.<br>
+</div>
+
+<pre><span id="VALconcat"><span class="keyword">val</span> concat</span> : <code class="type">'a <a href="Partial.html#TYPEt">t</a> -> 'a <a href="Partial.html#TYPEt">t</a> -> 'a <a href="Partial.html#TYPEt">t</a></code></pre><div class="info ">
+Concatenates finite streams, one then the next. Streams are
+    monoidal under the <a href="Partial.html#VALempty"><code class="code"><span class="constructor">Partial</span>.empty</code></a> stream and <a href="Partial.html#VALconcat"><code class="code"><span class="constructor">Partial</span>.concat</code></a>.<br>
+</div>
+
+<pre><span id="VALpush"><span class="keyword">val</span> push</span> : <code class="type">'a <a href="Partial.html#TYPEt">t</a> -> 'a <a href="Partial.html#TYPEt">t</a></code></pre><div class="info ">
+If a stream <code class="code">s</code> is interpreted as a process through time then
+    <code class="code">push s</code> is the same process beginning at <pre class="verbatim">t=-1</pre> instead of <pre class="verbatim">    t=0</pre>.<br>
+</div>
+
+<pre><span id="VALtake"><span class="keyword">val</span> take</span> : <code class="type">int -> 'a <a href="Partial.html#TYPEt">t</a> -> 'a list</code></pre><div class="info ">
+Convert a prefix of a stream into a <code class="code">list</code>. Note that the list
+    <code class="code">take n s</code> is not necessarily as long as <code class="code">n</code>.<br>
+</div>
+
+<pre><span id="VALdrop"><span class="keyword">val</span> drop</span> : <code class="type">int -> 'a <a href="Partial.html#TYPEt">t</a> -> 'a <a href="Partial.html#TYPEt">t</a></code></pre><div class="info ">
+Trim off a prefix of a stream.<br>
+</div>
+
+<pre><span id="VALinits"><span class="keyword">val</span> inits</span> : <code class="type">'a <a href="Partial.html#TYPEt">t</a> -> 'a list <a href="Partial.html#TYPEt">t</a></code></pre><div class="info ">
+Stream all prefixes of a stream.<br>
+</div>
+
+<pre><span id="VALtails"><span class="keyword">val</span> tails</span> : <code class="type">'a <a href="Partial.html#TYPEt">t</a> -> 'a <a href="Partial.html#TYPEt">t</a> <a href="Partial.html#TYPEt">t</a></code></pre><div class="info ">
+Stream all suffixes of a stream.<br>
+</div>
+
+<pre><span id="VALkeep"><span class="keyword">val</span> keep</span> : <code class="type">('a -> 'b option) -> 'a <a href="Partial.html#TYPEt">t</a> -> 'b <a href="Partial.html#TYPEt">t</a></code></pre><div class="info ">
+Transform a stream dropping some elements. See <a href="Partial.html#VALmap"><code class="code"><span class="constructor">Partial</span>.map</code></a>.<br>
+</div>
+
+<pre><span id="VALfilter"><span class="keyword">val</span> filter</span> : <code class="type">('a -> bool) -> 'a <a href="Partial.html#TYPEt">t</a> -> 'a <a href="Partial.html#TYPEt">t</a></code></pre><div class="info ">
+Dropping some elements of a stream. See <a href="Partial.html#VALkeep"><code class="code"><span class="constructor">Partial</span>.keep</code></a>.<br>
+</div>
+<br>
+<h1 id="impl">Implementation</h1><br>
+<br>
+The stream implementation is exposed to allow certain tricky
+    definitions. <i>This will hopefully be removed in later
+    versions, try not to depend upon it!</i><br>
+
+<pre><span class="keyword">module</span> <a href="Partial.Impl.html">Impl</a>: <code class="code"><span class="keyword">sig</span></code> <a href="Partial.Impl.html">..</a> <code class="code"><span class="keyword">end</span></code></pre></body></html>

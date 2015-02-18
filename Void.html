@@ -1,0 +1,49 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<link rel="stylesheet" href="style.css" type="text/css">
+<meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+<link rel="Start" href="index.html">
+<link rel="previous" href="Total.html">
+<link rel="Up" href="index.html">
+<link title="Index of types" rel=Appendix href="index_types.html">
+<link title="Index of values" rel=Appendix href="index_values.html">
+<link title="Index of modules" rel=Appendix href="index_modules.html">
+<link title="Partial" rel="Chapter" href="Partial.html">
+<link title="Total" rel="Chapter" href="Total.html">
+<link title="Void" rel="Chapter" href="Void.html"><title>Void</title>
+</head>
+<body>
+<div class="navbar"><a class="pre" href="Total.html" title="Total">Previous</a>
+&nbsp;<a class="up" href="index.html" title="Index">Up</a>
+&nbsp;</div>
+<h1>Module <a href="type_Void.html">Void</a></h1>
+
+<pre><span class="keyword">module</span> Void: <code class="code"><span class="keyword">sig</span></code> <a href="Void.html">..</a> <code class="code"><span class="keyword">end</span></code></pre><div class="info module top">
+The impossible type: no values can be made to exist.
+<p>
+
+    Values of type <a href="Void.html#TYPEt"><code class="code"><span class="constructor">Void</span>.t</code></a> cannot be made to exist, there are no
+    introduction forms. This makes them the impossible type; however,
+    they are not without their use. A function which claims to return
+    <a href="Void.html#TYPEt"><code class="code"><span class="constructor">Void</span>.t</code></a> must actually never return. A hypothetical situation which
+    offers a value of <a href="Void.html#TYPEt"><code class="code"><span class="constructor">Void</span>.t</code></a> must be <a href="Void.html#VALabsurd"><code class="code"><span class="constructor">Void</span>.absurd</code></a>.<br>
+</div>
+<hr width="100%">
+
+<pre><span id="TYPEt"><span class="keyword">type</span> <code class="type"></code>t</span> </pre>
+<div class="info ">
+The nonexistent data type.<br>
+</div>
+
+
+<pre><span id="VALabsurd"><span class="keyword">val</span> absurd</span> : <code class="type"><a href="Void.html#TYPEt">t</a> -> 'a</code></pre><div class="info ">
+It is possible in some hypothetical contexts to have access to a
+    value of type <a href="Void.html#TYPEt"><code class="code"><span class="constructor">Void</span>.t</code></a>. As no values of <a href="Void.html#TYPEt"><code class="code"><span class="constructor">Void</span>.t</code></a> can ever come into
+    existence we resolve that our hypotheses are wrong and thus
+    conclude whatever we like.
+<p>
+
+    In pithier words, <i>from nothing comes anything</i>.<br>
+</div>
+</body></html>

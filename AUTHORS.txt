@@ -1,3 +1,0 @@
-Authors of fstreams:
-
-* Joseph Abrahamson <me@jspha.com>
