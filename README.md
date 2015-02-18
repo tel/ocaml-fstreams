@@ -1,6 +1,8 @@
 Fstreams - Functional, lazy streams
 ===================================
 
+![Travis CI build status](https://travis-ci.org/tel/ocaml-fstreams.svg)
+
 A very standard infinite data structure is the stream which lazily
 determines its current and next values and even whether they exist or
 not! This data structure is useful for describing computations which
