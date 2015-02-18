@@ -32,3 +32,4 @@ Tk
   for cycling `Partial` streams into `Total` ones.
 * Include `ZArith` package and use big integers in all the appropriate
   places.
+* Extract `Void` module
