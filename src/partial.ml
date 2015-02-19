@@ -1,10 +1,4 @@
-module Impl = struct
-  type 'a t = 'a q Lazy.t
-  and 'a q = 
-    | Cons of 'a * 'a t
-    | Empty
-end
-
+module Impl = Internal.Partial
 include Impl
 
 let rec uncons q = uncons_ (Lazy.force q)
@@ -23,10 +17,10 @@ and     interleave_ xs ys = match xs with
   | Empty         -> Lazy.force ys
   | Cons (x, xs') -> Cons (x, interleave ys xs')
 
-let rec concat  sa sb = lazy (concat_ (Lazy.force sa) sb)
-and     concat_ sa sb = match sa with
+let rec sequence  sa sb = lazy (sequence_ (Lazy.force sa) sb)
+and     sequence_ sa sb = match sa with
   | Empty         -> Lazy.force sb
-  | Cons (x, xs') -> Cons (x, concat xs' sb)
+  | Cons (x, xs') -> Cons (x, sequence xs' sb)
 
 let rec fold  cons empty s = fold_ cons empty (Lazy.force s)
 and     fold_ cons empty   = function
