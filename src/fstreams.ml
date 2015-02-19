@@ -683,3 +683,9 @@ module Make (Lz : Lz) = struct
   end
   
 end
+
+
+module Memoized = Make (Lz.Memoized)
+module OneShot  = Make (Lz.OneShot)
+
+include Memoized
