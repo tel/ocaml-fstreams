@@ -8,10 +8,9 @@ Plugins:     META (0.4), DevFiles (0.4)
 
 Library fstreams
   Path:            src
-  Pack:            true
   BuildTools:      ocamlbuild
-  Modules:         Partial, Total, Void
-  InternalModules: Option, Internal
+  Modules:         Fstreams
+  InternalModules: Option, Void
   
 AlphaFeatures: ocamlbuild_more_args
 Document fstreams_api
