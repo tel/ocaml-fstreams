@@ -1,5 +1,5 @@
-Fstreams - Functional, lazy streams
-===================================
+Fstreams—Functional, lazy streams
+=================================
 
 [![Build Status](https://travis-ci.org/tel/ocaml-fstreams.svg?branch=master)](https://travis-ci.org/tel/ocaml-fstreams)
 
