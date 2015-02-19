@@ -10,7 +10,7 @@ Library fstreams
   Path:            src
   BuildTools:      ocamlbuild
   Modules:         Fstreams
-  InternalModules: Option, Void
+  InternalModules: Option
   
 AlphaFeatures: ocamlbuild_more_args
 Document fstreams_api
