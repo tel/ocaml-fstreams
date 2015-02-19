@@ -55,16 +55,6 @@ end
     offers a value of {!t} must be {!absurd}.
 
 *)
-
-(** The impossible type: no values can be made to exist.
-
-    Values of type {!t} cannot be made to exist, there are no
-    introduction forms. This makes them the impossible type; however,
-    they are not without their use. A function which claims to return
-    {!t} must actually never return. A hypothetical situation which
-    offers a value of {!t} must be {!absurd}.
-
-*)
 module Void : sig
 
   type t
