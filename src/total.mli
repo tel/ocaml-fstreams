@@ -44,6 +44,11 @@ val impure : (unit -> 'a) -> 'a t
 (** Generates a list impurely. Each new value of the stream [impure f]
     is produced by calling [f ()]. See also {!tabulate}. *)
 
+val of_partial : 'a Internal.Partial.t -> 'a t
+(** Partial streams can be extended to total streams by cycling
+    them. In other words, [to_total s] is the same as [sequence s
+    (sequence s ...)]. *)
+
 val tabulate : (int -> 'a) -> 'a t
 (** Generates a stream by tabulation of values.
 
@@ -52,13 +57,12 @@ val tabulate : (int -> 'a) -> 'a t
 
     See {!nth}.
 *)
-    
+
 val ints : int t
 (** An infinite stream of all integers. *)
 
 (** {i See also}: {!pure} *)
-
-
+    
 
 
 (** {1:elimination Value elimination } *)

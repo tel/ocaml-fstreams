@@ -11,7 +11,7 @@ Library fstreams
   Pack:            true
   BuildTools:      ocamlbuild
   Modules:         Partial, Total, Void
-  InternalModules: Option
+  InternalModules: Option, Internal
   
 AlphaFeatures: ocamlbuild_more_args
 Document fstreams_api
