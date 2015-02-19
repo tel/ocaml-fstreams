@@ -1,9 +1,5 @@
 
-module Impl = struct
-  type 'a t = 'a q Lazy.t
-  and 'a q = { head : 'a; tail : 'a t }
-end
-
+module Impl = Internal.Total
 include Impl
 
 let rec uncons  q = uncons_ (Lazy.force q)

@@ -60,6 +60,10 @@ val of_list : 'a list -> 'a t
     are the greatest fixed point of.
 *)
 
+val of_total : 'a Internal.Total.t -> 'a t
+(** As partial streams may be infinite we can inject total streams
+    into them. *)
+
 val tabulate : (int -> 'a option) -> 'a t
 (** Generates a stream by tabulation of values. The generation
     proceeds sequentially such that the stream [tabulate f] is either
@@ -160,9 +164,9 @@ val interleave : 'a t -> 'a t -> 'a t
     streams [let x = [1;2;3;...]] and [let y = [a;b;c;...]] are
     interwoven to form [interleave x y = [1;a;2;b;3;c;...]]. *)
 
-val concat : 'a t -> 'a t -> 'a t
-(** Concatenates finite streams, one then the next. Streams are
-    monoidal under the {!empty} stream and {!concat}. *)
+val sequence : 'a t -> 'a t -> 'a t
+(** Sequences finite streams, one then the next. Streams are monoidal
+    under the {!empty} stream and {!sequence}. *)
 
 val push : 'a t -> 'a t
 (** If a stream [s] is interpreted as a process through time then
