@@ -146,6 +146,18 @@ module S = struct
         See {!nth}.
     *)
 
+    val mu : ('a t -> 'a t) -> 'a t
+    (** Generate a stream by "tying the knot"; a lazy fixed-point
+        operator on streams. This can be used to make remarkably
+        efficient lazy streams by enforcing structure sharing. Note
+        that this function provides memoization even when using
+        {!OneShot} laziness.
+
+        For instance, [unfold (fun n -> (n, n mod 3)) 0] and [mu (fun
+        s -> cons 0 (cons 1 (cons 2 s)))] are structurally identical,
+        but the latter will only allocate 3 times no matter how deeply
+        the stream is viewed. *)
+    
     val ints : int t
     (** An infinite stream of all integers. *)
 
@@ -491,7 +503,7 @@ end = struct
     with type 'a thunk   := 'a Lz.t
      and type 'a partial := 'a Partial.t =
   struct
-    
+
     type 'a t     = 'a total
         
     module Impl = struct
@@ -506,7 +518,7 @@ end = struct
     let tail s = snd (uncons s)
         
     let cons head tail = Lz.from_val { head; tail }
-        
+
     let rec interleave  sa sb    = Lz.from_fun (interleave_ (Lz.force sa) sb)
     and     interleave_ xs ys () = { head = xs.head; tail = interleave ys xs.tail }
                                 
@@ -526,11 +538,19 @@ end = struct
     let trajectory endo x = unfold (fun x -> (x, endo x)) x
         
     let impure gen = unfold (fun s -> (gen s, s)) ()
-        
+
+    let mu f_ =
+      let rec x = lazy begin
+        Lz.from_fun begin fun () ->
+          Lz.force (f_ (Lazy.Memoized.force x))
+        end
+      end
+      in Lazy.Memoized.force x
+            
     let rec iter eff s =
       let { head; tail } = Lz.force s in
       eff head; iter eff tail
-        
+
     let rec map  f s    = Lz.from_fun (map_ f (Lz.force s))
     and     map_ f s () = { head = f s.head; tail = map f s.tail }
                        
@@ -647,7 +667,15 @@ end = struct
 
     let rec of_total tot = Lz.from_fun (aux (Lz.force tot))
     and aux { head; tail } () = Cons (head, of_total tail)
-    
+
+    let mu f_ =
+      let rec x = lazy begin
+        Lz.from_fun begin fun () ->
+          Lz.force (f_ (Lazy.Memoized.force x))
+        end
+      end
+      in Lazy.Memoized.force x
+
     let rec map  f s    = Lz.from_fun (map_ f (Lz.force s))
     and     map_ f s () = match s with
       | Empty        -> Empty
