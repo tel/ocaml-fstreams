@@ -1,16 +1,11 @@
 
 module Thunk = struct
 
-  module type Basis = sig
+  module type S = sig
     type +'a t
     val force    : 'a t -> 'a
     val from_fun : (unit -> 'a) -> 'a t
     val from_val : 'a -> 'a t
-    val is_val   : 'a t -> bool
-  end
-
-  module type S = sig
-    include Basis
     val map  : ('a -> 'b) -> ('a t -> 'b t)
     val map2 : ('a -> 'b -> 'c) -> ('a t -> 'b t -> 'c t)
     val pure : 'a -> 'a t
@@ -19,37 +14,33 @@ module Thunk = struct
     val join : 'a t t -> 'a t
   end
 
-  module Make ( B : Basis ) : S
-    with type 'a t = 'a B.t =
-  struct
-    include B
-    let map f t =
-      if B.is_val t
-      then B.from_val (f (B.force t))
-      else B.from_fun (fun _ -> f (B.force t))
-    let map2 f tx ty = match B.is_val tx, B.is_val ty with
-      | true, true -> B.from_val (f (B.force tx) (B.force ty))
-      | _ -> B.from_fun (fun _ -> f (B.force tx) (B.force ty))
-    let pure = B.from_val
-    let ap tf tx = match B.is_val tf, B.is_val tx with
-      | true, true -> B.from_val (B.force tf (B.force tx))
-      | _ -> B.from_fun (fun _ -> B.force tf (B.force tx))
-    let join t =
-      if B.is_val t then B.force t
-      else B.from_fun (fun _ -> B.force (B.force t))
-    let bind f t =
-      if B.is_val t then f (B.force t)
-      else B.from_fun (fun _ -> B.force (f (B.force t)))
-  end
-
   (** Memoized laziness replaces forced values by their realizations
       possibly saving large amounts of recomputation at the cost of
       an extra indirection and reference for each node in the stream.
 
       This is just an alias for the system Lazy module. *)
   module Memoized : S
-    with type 'a t = 'a Lazy.t
-    = Make (Lazy)
+    with type 'a t = 'a Lazy.t =
+  struct
+    include Lazy
+    let map f t =
+      if Lazy.is_val t
+      then Lazy.from_val (f (Lazy.force t))
+      else Lazy.from_fun (fun _ -> f (Lazy.force t))
+    let map2 f tx ty = match Lazy.is_val tx, Lazy.is_val ty with
+      | true, true -> Lazy.from_val (f (Lazy.force tx) (Lazy.force ty))
+      | _ -> Lazy.from_fun (fun _ -> f (Lazy.force tx) (Lazy.force ty))
+    let pure = Lazy.from_val
+    let ap tf tx = match Lazy.is_val tf, Lazy.is_val tx with
+      | true, true -> Lazy.from_val (Lazy.force tf (Lazy.force tx))
+      | _ -> Lazy.from_fun (fun _ -> Lazy.force tf (Lazy.force tx))
+    let join t =
+      if Lazy.is_val t then Lazy.force t
+      else Lazy.from_fun (fun _ -> Lazy.force (Lazy.force t))
+    let bind f t =
+      if Lazy.is_val t then f (Lazy.force t)
+      else Lazy.from_fun (fun _ -> Lazy.force (f (Lazy.force t)))
+  end
 
   (** One-shot laziness performs no memoization. It can be much faster
       than memoized laziness so long as values are only accessed once. *)
