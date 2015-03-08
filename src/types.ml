@@ -1,16 +1,16 @@
 
-module MakeStreams (Lazy : Wrappers.Thunk_s) = struct
+module Make (Thunk : Wrappers.Thunk_s) = struct
 
-  type 'a partial = unit -> 'a partial_node
-  and 'a partial_node =
-    | Nil
-    | Cons of 'a * 'a partial
-
-  type 'a total = unit -> 'a total_node
-  and 'a total_node =
+  type ('a, 'x) node =
     { head : 'a
-    ; tail : 'a total
+    ; tail : 'x
     }
+
+  type 'a total   = Total   of ('a, 'a total)   node        Thunk.t
+  type 'a partial = Partial of ('a, 'a partial) node option Thunk.t
+
+  let to_total (s0 : 'a partial) : 'a total =
+    let aux (Partial s) = Thunk
 
 end
 
