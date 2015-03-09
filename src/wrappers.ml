@@ -62,3 +62,28 @@ module Thunk = struct
   end
 
 end
+
+module Totality = struct
+
+  module type S = sig
+    type +'a t
+    type zero
+  end
+
+  module Pure : S
+    with type 'a t = 'a
+     and type zero = Void.t =
+  struct
+    type 'a t = 'a
+    type zero = Void.t
+  end
+
+  module Partial : S
+    with type 'a t = 'a option
+     and type zero = unit =
+  struct
+    type 'a t = 'a option
+    type zero = unit
+  end
+
+end
