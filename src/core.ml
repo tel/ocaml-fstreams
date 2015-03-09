@@ -1,5 +1,5 @@
 
-type ('a, 'x) node =
+type (+'a, +'x) node =
   { head : 'a
   ; tail : 'x
   }
@@ -9,18 +9,21 @@ let rmap f n = { n with tail = f n.tail }
 
 module type S = sig
 
-  type 'a total
-  type 'a partial
+  type +'a thunk
+  type +'a total   = Total   of ('a, 'a total)   node        thunk
+  type +'a partial = Partial of ('a, 'a partial) node option thunk
 
   val to_total   : 'a partial -> 'a total
   val to_partial : 'a total -> 'a partial
 
 end
 
-module Make (Thunk : Wrappers.Thunk.S) : S = struct
-
-  type 'a total   = Total   of ('a, 'a total)   node        Thunk.t
-  type 'a partial = Partial of ('a, 'a partial) node option Thunk.t
+module Make (Thunk : Wrappers.Thunk.S)
+  : S with type 'a thunk = 'a Thunk.t
+= struct
+  type +'a thunk   = 'a Thunk.t
+  type +'a total   = Total   of ('a, 'a total)   node        Thunk.t
+  type +'a partial = Partial of ('a, 'a partial) node option Thunk.t
 
   let to_total (Partial s0 as p : 'a partial) : 'a total =
     let rec roll : ('a, 'a partial) node option -> ('a, 'a total) node = function

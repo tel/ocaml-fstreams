@@ -4,7 +4,7 @@ module type Folded = sig
 
   module Totality : Wrappers.Totality.S
 
-  val embed : ('a * 'a t) Totality.t -> 'a t
+  val embed : ('a * 'a t) Totality.t thunk -> 'a t
   (** The "principle introduction form" for a stream. Can be used along with
       recursion to derive all of the others. The fact that the return
       value is potentially partial indicates the potentially finite nature of
@@ -74,7 +74,7 @@ module type Naperian = sig
   (** Convert a stream into an accessor function on index. See
       {!tabulate}. *)
 
-  val tabulate : (int -> 'a option) -> 'a t
+  val tabulate : (int -> 'a Totality.t) -> 'a t
   (** Generates a stream by tabulation of values. The generation
       proceeds sequentially such that the stream [tabulate f] is either
       infinite or has length equal to the {i first} [n] such that [f n]
@@ -98,7 +98,7 @@ end
 module type Applicative = sig
   type +'a t
 
-  val pure : 'a -> 'a
+  val pure : 'a -> 'a t
   (** Produces the infinite, constant stream of some value. *)
 
   val ap : ('a -> 'b) t -> ('a t -> 'b t)
@@ -135,11 +135,6 @@ end
 module type Streaming = sig
   type +'a t
 
-  val interleave : 'a t -> 'a t -> 'a t
-  (** Interleaves two streams, non-associative. For instance, the
-      streams [let x = [1;2;3;...]] and [let y = [a;b;c;...]] are
-      interwoven to form [interleave x y = [1;a;2;b;3;c;...]]. *)
-
   val push : 'a t -> 'a t
   (** If a stream [s] is interpreted as a process through time then
       [delay s] is the same process beginning at {v t=-1 v} instead of
@@ -164,6 +159,11 @@ module type Streaming = sig
 
   val filter     : ('a -> bool) -> ('a t -> 'a t)
   (** Dropping some elements of a stream. See {!keep}. *)
+
+  val interleave : 'a t -> 'a t -> 'a t
+  (** Interleaves two streams, non-associative. For instance, the
+      streams [let x = [1;2;3;...]] and [let y = [a;b;c;...]] are
+      interwoven to form [interleave x y = [1;a;2;b;3;c;...]]. *)
 end
 
 (** A total lazy stream; a necessarily unbounded sequence of values of
