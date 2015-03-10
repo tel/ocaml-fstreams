@@ -1,2 +1,5 @@
 S src
+S src/internal
+B _build
 B _build/src
+B _build/src/internal
