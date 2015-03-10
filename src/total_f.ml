@@ -1,5 +1,5 @@
 
-module Total ( Thunk : Wrappers.Thunk.S )
+module Make ( Thunk : Wrappers.Thunk.S )
   : Sigs.Total
     with type 'a t       = 'a Core.Make(Thunk).total
      and type 'a thunk   = 'a Thunk.t
@@ -23,11 +23,6 @@ module Total ( Thunk : Wrappers.Thunk.S )
      and type 'a thunk   := 'a thunk
      and module Totality := Totality
   = struct
-
-    module Totality = Totality
-
-    type 'a t       = 'a Types.total
-    type 'a thunk   = 'a Thunk.t
 
     let embed t = Total (Thunk.map (fun (head, tail) -> {head; tail}) t)
     let project (Total s) =
@@ -119,10 +114,7 @@ module Total ( Thunk : Wrappers.Thunk.S )
   module Applicative : Sigs.Applicative
     with type 'a t := 'a t
   = struct
-    let pure a =
-      let rec aux () =
-        embed (Thunk.from_fun (fun () -> (a, aux ())))
-      in aux ()
+    let pure a = unfold (fun () -> (a, ())) ()
 
     let rec ap (Total sf) (Total sa) =
       Total (Thunk.from_fun (ap_ (Thunk.force sf) (Thunk.force sa)))

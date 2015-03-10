@@ -4,6 +4,10 @@ type (+'a, +'x) node =
   ; tail : 'x
   }
 
+let tup   { head; tail } = ( head, tail )
+let untup ( head, tail ) = { head; tail }
+
+let bimap f g { head ; tail } = { head = f head; tail = g tail }
 let lmap f n = { n with head = f n.head }
 let rmap f n = { n with tail = f n.tail }
 
